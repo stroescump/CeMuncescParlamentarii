@@ -1,18 +1,17 @@
+// src/server.js
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import projectsRoutes from './routes/projects.js';
+import billsRoutes from './routes/bills.js';
 
-const server = Fastify({ logger: true });
-await server.register(cors, { origin: true });
-await server.register(projectsRoutes, { prefix: '/api/projects' });
+const fastify = Fastify({ logger: true });
 
-const start = async () => {
-  try {
-    await server.listen({ port: 3001, host: '0.0.0.0' });
-    console.log('Backend listening on 3001');
-  } catch (err) {
-    server.log.error(err);
-    process.exit(1);
-  }
-};
-start();
+await fastify.register(cors, { origin: true });
+
+// register the bills plugin under /api/bills
+await fastify.register(billsRoutes, { prefix: '/api/bills' });
+
+const PORT = process.env.PORT || 4000;
+await fastify.listen({ port: Number(PORT), host: '0.0.0.0' });
+
+// helpful: print routes to verify
+fastify.log.info(`Routes:\n${fastify.printRoutes()}`);
