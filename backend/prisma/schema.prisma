@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  externalId  String    @unique
+  title       String
+  shortHeadline String?
+  rawHtml     String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  versions    Version[]
+  votes       Vote[]
+  files       File[]
+}
+
+model Version {
+  id         Int     @id @default(autoincrement())
+  project    Project @relation(fields: [projectId], references: [id])
+  projectId  Int
+  versionTag String?
+  text       String? @db.Text
+  createdAt  DateTime @default(now())
+}
+
+model Vote {
+  id         Int    @id @default(autoincrement())
+  project    Project @relation(fields: [projectId], references: [id])
+  projectId  Int
+  deputyName String
+  vote       String  // "for" | "against" | "abstain" | "absent"
+}
+
+model File {
+  id        Int    @id @default(autoincrement())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+  url       String
+  mime      String?
+  text      String? @db.Text
+}
