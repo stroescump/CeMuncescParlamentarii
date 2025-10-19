@@ -13,25 +13,28 @@ services:
 
   backend:
     build: ./backend
+    container_name: backend
     depends_on:
       - db
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@db:5432/civictv?schema=public"
     ports:
-      - "3001:3001"
+      - "4000:4000"
     volumes:
-      - ./backend:/usr/src/app
-    command: ["npm", "run", "dev"]
+      - ./backend:/usr/src/app:cached # allow code mount
+      - /usr/src/app/node_modules
+    command: [ "npm", "run", "dev" ]
 
   frontend:
     build: ./frontend
+    container_name: frontend
     depends_on:
       - backend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/usr/src/app
-    command: ["npm", "run", "dev"]
+    command: [ "npm", "run", "dev" ]
 
 volumes:
   db_data:
